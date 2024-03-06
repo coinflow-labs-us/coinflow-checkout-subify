@@ -72,30 +72,35 @@ export function useWithdrawWallet() {
   useEffect(() => {
     const init = async () => {
       try {
+        const RPC_URL = "https://rude-elbertine-fast-devnet.helius-rpc.com/";
+
         const chainConfig = {
           chainNamespace: CHAIN_NAMESPACES.SOLANA,
           chainId: "0x3", // Please use 0x1 for Mainnet, 0x2 for Testnet, 0x3 for Devnet
-          // rpcTarget: process.env.REACT_APP_API_URL, // This is the public RPC we have added, please pass on your own endpoint while creating an app
-          rpcTarget: import.meta.env.VITE_RPC_URL,
+          rpcTarget: RPC_URL,
+          blockExplorerUrl: "https://explorer.solana.com",
+          ticker: "SOL",
+          tickerName: "Solana",
+          logo: "https://images.toruswallet.io/solana.svg",
         };
 
         const privateKeyProvider = new SolanaPrivateKeyProvider({
-          config: { chainConfig: chainConfig },
+          config: { chainConfig },
         });
 
-        const web3auth = new Web3Auth({
+        const web3 = new Web3Auth({
           clientId:
             "BPiYjwnlxjhSB4i0HzhjW3pKGp9trJvK1AaBXmoDNTXFUT8fjMVIe5zk9KN6kNqs6v2KyKY2JF0TEtaxxSPwu1s",
           web3AuthNetwork: "testnet", // mainnet, aqua, celeste, cyan or testnet
           privateKeyProvider,
         });
 
-        setWeb3auth(web3auth);
+        setWeb3auth(web3);
 
-        await web3auth.initModal();
+        await web3.initModal();
 
-        if (web3auth.provider) {
-          setProvider(web3auth.provider);
+        if (web3.provider) {
+          setProvider(web3.provider);
         }
       } catch (error) {
         console.error(error);
@@ -109,13 +114,16 @@ export function useWithdrawWallet() {
     if (!web3auth) {
       throw new Error("web3auth not initialized yet");
     }
-    const web3authProvider = await web3auth.connect();
-
-    setProvider(web3authProvider);
-    getAccounts().then((accounts) => {
-      if (!Array.isArray(accounts)) return;
-      setPublicKey(new PublicKey(accounts[0]));
-    });
+    try {
+      const web3authProvider = await web3auth.connect();
+      setProvider(web3authProvider);
+      getAccounts().then((accounts) => {
+        if (!Array.isArray(accounts)) return;
+        setPublicKey(new PublicKey(accounts[0]));
+      });
+    } catch (e) {
+      console.log(e);
+    }
   };
 
   const getAccounts = useCallback(async () => {

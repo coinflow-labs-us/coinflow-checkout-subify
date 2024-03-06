@@ -2,17 +2,25 @@ import { useWithdrawWallet } from "../hooks/useWithdrawWallet.tsx";
 import { useCallback } from "react";
 import { useHeightHandler } from "../hooks/useHeightHandler.tsx";
 import { CoinflowWithdraw, SolanaWallet } from "@coinflowlabs/react";
-import { APP_THEME } from "../contants.ts";
+import {
+  APP_THEME,
+  BLOCKCHAIN,
+  COINFLOW_ENV,
+  MERCHANT_ID,
+} from "../contants.ts";
+import { useQuery } from "../hooks/useQuery.tsx";
 
 export function Withdraw() {
-  const wallet: SolanaWallet = useWithdrawWallet();
+  const query = useQuery();
+  const wallet = useWithdrawWallet();
   const { height, handleHeightChange } = useHeightHandler();
 
   const onSuccess = useCallback(() => {
     // Optional
   }, []);
 
-  if (!wallet || !wallet.publicKey) return <LoginForm />;
+  if (!wallet || !wallet.publicKey)
+    return <LoginForm connect={wallet.connect} />;
 
   return (
     <div style={{ height }} className={"w-full relative"}>
@@ -21,11 +29,11 @@ export function Withdraw() {
       <CoinflowWithdraw
         theme={APP_THEME}
         wallet={wallet as SolanaWallet}
-        merchantId={"privy"}
-        env={"sandbox"}
+        merchantId={MERCHANT_ID}
+        env={COINFLOW_ENV}
         onSuccess={onSuccess}
-        blockchain={"polygon"}
-        email={""}
+        blockchain={BLOCKCHAIN}
+        email={query.get("email") ?? ""}
         loaderBackground={APP_THEME.background}
         handleHeightChange={handleHeightChange}
       />
@@ -33,8 +41,7 @@ export function Withdraw() {
   );
 }
 
-function LoginForm() {
-  const { connect } = useWithdrawWallet();
+function LoginForm({ connect }: { connect: () => void }) {
   return (
     <div
       className={
