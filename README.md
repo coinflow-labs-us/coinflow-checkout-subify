@@ -10,7 +10,7 @@ Pages:
 Top up your wallet with credits to be spent later
 
 **Purchase with USDC**
-/usd-purchase?wallet=<wallet>
+/usd-purchase?wallet=<wallet>&amount=<amount>
 
 Purchase directly with existing credits or USDC
 
@@ -18,6 +18,8 @@ Purchase directly with existing credits or USDC
 /subscribe?wallet=<wallet>&planCode=<subscription_plan_code>
 
 Subscribe to a certain plan named by the 'plan code' query param
+
+Test Plan Code is: "test_plan"
 
 **Withdraw**
 /withdraw
