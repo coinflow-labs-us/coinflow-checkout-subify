@@ -1,24 +1,29 @@
-# Coinflow Checkout/Withdraw Template
-
-This template provides a setup template for Coinflow checkout and withdraw on EVM.
+# Coinflow <> Subify Checkout/Withdraw Pages
 
 Start command: npm run dev
 
-Completion requirements:
+Pages:
 
-#### Wallet Setup
-1) navigate to useWallet.tsx
-2) configure the connected wallet address
-3) customize the signMessage function
-4) complete the sendTransaction function
+**Buy Credits**
+/buy-credits?wallet=<wallet>
 
-#### Theme customization
-1) navigate to App.tsx
-2) edit constant APP_THEME
+Top up your wallet with credits to be spent later
 
-#### Custom success method (optional)
-1) in Checkout.tsx & Withdraw.tsx
-2) find method onSuccess()
-3) add custom logic that will run on completed withdraw or purchase
+**Purchase with USDC**
+/usd-purchase?wallet=<wallet>
+
+Purchase directly with existing credits or USDC
+
+**Purchase with USDC**
+/subscribe?wallet=<wallet>&planCode=<subscription_plan_code>
+
+Subscribe to a certain plan named by the 'plan code' query param
+
+**Withdraw**
+/withdraw
+
+Withdraw tokens to your bank account or debit card. 
+Note that no wallet is being used as a query param and that sign in is different for withdraw.
+
 
 Please contact ben@coinflowlabs.app or jake@coinflowlabs.app for support. Enjoy!
