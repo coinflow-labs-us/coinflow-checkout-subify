@@ -6,6 +6,13 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { BuyCredits } from "./pages/BuyCredits.tsx";
 import { Subscribe } from "./pages/Subscribe.tsx";
 import { UsdcPurchase } from "./pages/UsdcPurchase.tsx";
+import { Withdraw } from "./pages/Withdraw.tsx";
+
+if (typeof global === "undefined") {
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-expect-error
+  (window as unknown).global = window;
+}
 
 const router = createBrowserRouter([
   {
@@ -24,6 +31,10 @@ const router = createBrowserRouter([
       {
         path: "/usd-purchase",
         element: <UsdcPurchase />,
+      },
+      {
+        path: "/withdraw",
+        element: <Withdraw />,
       },
     ],
   },

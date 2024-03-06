@@ -38,8 +38,6 @@ export function Subscribe() {
         amount={Number(query.get("amount"))}
         handleHeightChange={handleHeightChange}
         planCode={planCode}
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-expect-error
         theme={APP_THEME}
         email={query.get("email") ?? undefined}
         loaderBackground={APP_THEME.background}

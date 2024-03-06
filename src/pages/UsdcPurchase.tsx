@@ -9,6 +9,7 @@ import {
   BLOCKCHAIN,
   COINFLOW_ENV,
   MERCHANT_ID,
+  SettlementType,
 } from "../contants.ts";
 
 export function UsdcPurchase() {
@@ -29,13 +30,12 @@ export function UsdcPurchase() {
         merchantId={MERCHANT_ID}
         wallet={wallet}
         blockchain={BLOCKCHAIN}
+        settlementType={SettlementType.USDC}
         connection={connection}
         env={COINFLOW_ENV}
         onSuccess={onSuccess}
         amount={Number(query.get("amount"))}
         handleHeightChange={handleHeightChange}
-        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-        // @ts-expect-error
         theme={APP_THEME}
         email={query.get("email") ?? undefined}
         loaderBackground={APP_THEME.background}
