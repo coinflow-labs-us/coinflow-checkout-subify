@@ -45,7 +45,7 @@ function LoginForm({ connect }: { connect: () => void }) {
   return (
     <div
       className={
-        "bg-black lg:bg-white p-10 flex flex-1 relative items-center justify-center"
+        "bg-black p-10 flex flex-1 relative items-center justify-center"
       }
     >
       <button
