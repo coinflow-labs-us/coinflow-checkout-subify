@@ -1,0 +1,18 @@
+services:
+  - type: web
+    name: subify-staging
+    env: static
+    branch: main
+    buildCommand: npm install && npm run build
+    staticPublishPath: build
+    domains:
+      - subify-staging.coinflow.cash
+    envVars:
+      - key: VITE_ENV
+        value: sandbox
+      - key: VITE_RPC_URL
+        value: https://api.devnet.solana.com
+    routes:
+      - type: rewrite
+        source: /*
+        destination: /index.html

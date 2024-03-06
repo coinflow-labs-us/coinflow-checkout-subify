@@ -1,20 +1,18 @@
-import { Connection, PublicKey, Transaction } from "@solana/web3.js";
-import { CustomChainConfig, SafeEventEmitterProvider } from "@web3auth/base";
-import { SolanaWallet } from "@web3auth/solana-provider";
+import {Connection, PublicKey, Transaction} from "@solana/web3.js";
+import {IProvider} from "@web3auth/base";
+import {SolanaWallet} from "@web3auth/solana-provider";
 
 export default class SolanaRpc {
-  private provider: SafeEventEmitterProvider;
+  private readonly provider: IProvider;
 
-  constructor(provider: SafeEventEmitterProvider) {
+  constructor(provider: IProvider) {
     this.provider = provider;
   }
 
   getAccounts = async (): Promise<string[]> => {
     try {
       const solanaWallet = new SolanaWallet(this.provider);
-      const acc = await solanaWallet.requestAccounts();
-
-      return acc;
+      return await solanaWallet.requestAccounts();
     } catch (error) {
       return error as string[];
     }
@@ -23,7 +21,8 @@ export default class SolanaRpc {
   getBalance = async (): Promise<string> => {
     try {
       const solanaWallet = new SolanaWallet(this.provider);
-      const connectionConfig = await solanaWallet.request<CustomChainConfig>({
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const connectionConfig: any = await solanaWallet.request({
         method: "solana_provider_config",
         params: [],
       });

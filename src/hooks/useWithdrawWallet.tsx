@@ -7,12 +7,12 @@ import {
 } from "@solana/web3.js";
 import RPC from "../SolanaRpc.ts";
 import { Web3Auth } from "@web3auth/modal";
-import { CHAIN_NAMESPACES, SafeEventEmitterProvider } from "@web3auth/base";
+import {CHAIN_NAMESPACES, IProvider} from "@web3auth/base";
 import { SolanaPrivateKeyProvider } from "@web3auth/solana-provider";
 
 export function useWithdrawWallet() {
   const [web3auth, setWeb3auth] = useState<Web3Auth | null>(null);
-  const [provider, setProvider] = useState<SafeEventEmitterProvider | null>(
+  const [provider, setProvider] = useState<IProvider | null>(
     null,
   );
 

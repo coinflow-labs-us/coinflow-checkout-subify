@@ -1,3 +1,5 @@
+import {CoinflowEnvs} from "@coinflowlabs/react";
+
 export const APP_THEME = {
   primary: "#FFDA00",
   background: "#000000",
@@ -16,5 +18,5 @@ export enum SettlementType {
 }
 
 export const MERCHANT_ID = "subify-development";
-export const COINFLOW_ENV = "sandbox";
+export const COINFLOW_ENV = import.meta.env.VITE_ENV as CoinflowEnvs;
 export const BLOCKCHAIN = "solana";
