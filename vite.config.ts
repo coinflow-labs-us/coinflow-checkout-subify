@@ -4,12 +4,14 @@ import inject from "@rollup/plugin-inject";
 import commonjs from "@rollup/plugin-commonjs";
 import nodeResolve from "@rollup/plugin-node-resolve";
 import { nodePolyfills } from "vite-plugin-node-polyfills";
+import resolve from "@rollup/plugin-node-resolve";
 
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [
     react(),
-    commonjs(),
+    resolve(),
+    commonjs({ include: /node_modules/ }),
     nodeResolve({
       browser: true,
       preferBuiltins: false,
@@ -38,6 +40,7 @@ export default defineConfig({
   ],
   build: {
     outDir: "build",
+    commonjsOptions: { include: ["default"] },
     rollupOptions: {
       plugins: [inject({ Buffer: ["buffer", "Buffer"], process: "process" })],
     },
