@@ -90,7 +90,7 @@ export function useWithdrawWallet() {
 
         const web3 = new Web3Auth({
           clientId:
-            "BPiYjwnlxjhSB4i0HzhjW3pKGp9trJvK1AaBXmoDNTXFUT8fjMVIe5zk9KN6kNqs6v2KyKY2JF0TEtaxxSPwu1s",
+            "BJT95M-u7Mrx7s7uZvjdLXx1k8en8pvqWcourJsDOe-8QukCuMcLGEwczzu6glj10EWpPNUu8lXNKvbbNXSr4II",
           web3AuthNetwork: "testnet", // mainnet, aqua, celeste, cyan or testnet
           privateKeyProvider,
         });
