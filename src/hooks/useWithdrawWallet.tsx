@@ -7,14 +7,12 @@ import {
 } from "@solana/web3.js";
 import RPC from "../SolanaRpc.ts";
 import { Web3Auth } from "@web3auth/modal";
-import {CHAIN_NAMESPACES, IProvider} from "@web3auth/base";
+import { CHAIN_NAMESPACES, IProvider, WEB3AUTH_NETWORK } from "@web3auth/base";
 import { SolanaPrivateKeyProvider } from "@web3auth/solana-provider";
 
 export function useWithdrawWallet() {
   const [web3auth, setWeb3auth] = useState<Web3Auth | null>(null);
-  const [provider, setProvider] = useState<IProvider | null>(
-    null,
-  );
+  const [provider, setProvider] = useState<IProvider | null>(null);
 
   const [publicKey, setPublicKey] = useState<PublicKey | null>(null);
 
@@ -91,7 +89,7 @@ export function useWithdrawWallet() {
         const web3 = new Web3Auth({
           clientId:
             "BPiYjwnlxjhSB4i0HzhjW3pKGp9trJvK1AaBXmoDNTXFUT8fjMVIe5zk9KN6kNqs6v2KyKY2JF0TEtaxxSPwu1s",
-          web3AuthNetwork: "testnet", // mainnet, aqua, celeste, cyan or testnet
+          web3AuthNetwork: WEB3AUTH_NETWORK.SAPPHIRE_DEVNET, // mainnet, aqua, celeste, cyan or testnet
           privateKeyProvider,
         });
 
