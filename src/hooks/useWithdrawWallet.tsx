@@ -1,158 +1,71 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import {useCallback, useEffect, useMemo, useState} from "react";
 import {
   Connection,
   PublicKey,
   Transaction,
   VersionedTransaction,
 } from "@solana/web3.js";
-import RPC from "../SolanaRpc.ts";
-import { Web3Auth } from "@web3auth/modal";
-import { CHAIN_NAMESPACES, IProvider, WEB3AUTH_NETWORK } from "@web3auth/base";
-import { SolanaPrivateKeyProvider } from "@web3auth/solana-provider";
+import {MetaKeep} from "metakeep";
+import {useQuery} from "./useQuery.tsx";
 
 export function useWithdrawWallet() {
-  const [web3auth, setWeb3auth] = useState<Web3Auth | null>(null);
-  const [provider, setProvider] = useState<IProvider | null>(null);
+  const query = useQuery();
+
+  const metakeep = useMemo(() => {
+    return new MetaKeep({
+      /* App id to configure UI */
+      appId: "31bfa094-50c6-4036-bc32-8480c57b2edc",
+      /* Signed in user's email address */
+      user: {
+        email: query.get('email'),
+      }
+    })
+  }, [query]);
 
   const [publicKey, setPublicKey] = useState<PublicKey | null>(null);
-
   const connected = useMemo(() => !!publicKey, [publicKey]);
 
+  useEffect(() => {
+    metakeep.getWallet().then(res => setPublicKey(new PublicKey(res.wallet.solAddress)));
+  }, [metakeep]);
+
   const connection = useMemo(() => {
-    const rpcUrl = web3auth?.options.chainConfig?.rpcTarget;
-    if (!rpcUrl) return null;
-    return new Connection(rpcUrl, "confirmed");
-  }, [web3auth?.options.chainConfig?.rpcTarget]);
+    return new Connection(import.meta.env.VITE_RPC_URL!, "confirmed");
+  }, []);
+
+  const signTransaction = useCallback(
+    async (transaction: Transaction | VersionedTransaction) => {
+      const metakeepRes: {signature: string} = await metakeep.signTransaction(transaction, 'Withdraw USD');
+      const signature = Buffer.from(metakeepRes.signature.replace('0x', ''), 'hex');
+      if (transaction instanceof Transaction) {
+        transaction.signatures.push({
+          publicKey: publicKey!,
+          signature,
+        });
+        transaction.signatures = transaction.signatures.filter(sig => !!sig.signature);
+      } else {
+        transaction.signatures.push(signature);
+      }
+
+      return transaction;
+    },
+    [metakeep, publicKey],
+  );
 
   const sendTransaction = useCallback(
     async (transaction: Transaction | VersionedTransaction) => {
-      console.log(
-        Buffer.from(
-          transaction.serialize({
-            verifySignatures: false,
-            requireAllSignatures: false,
-          }),
-        ).toString("base64"),
-      );
-      if (!provider) {
-        throw new Error("provider not initialized yet");
-      }
-      const rpc = new RPC(provider);
-      const signedTx = await rpc.signTransaction(transaction as Transaction);
-      if (!connection) throw new Error("error");
+      const signedTx = await signTransaction(transaction);
       return await connection.sendRawTransaction(signedTx.serialize());
     },
-    [connection, provider],
-  );
-
-  const signTransaction = useCallback(
-    async (transaction: Transaction) => {
-      if (!provider) {
-        throw new Error("provider not initialized yet");
-      }
-      const rpc = new RPC(provider);
-      return await rpc.signTransaction(transaction);
-    },
-    [provider],
+    [connection, signTransaction],
   );
 
   const signMessage = useCallback(
     async (message: string) => {
-      if (!provider) {
-        throw new Error("provider not initialized yet");
-      }
-      const rpc = new RPC(provider);
-      return await rpc.signMessage(message);
+      return await metakeep.signMessage(message, 'Sign in');
     },
-    [provider],
+    [metakeep],
   );
-
-  useEffect(() => {
-    const init = async () => {
-      try {
-        const RPC_URL = "https://rude-elbertine-fast-devnet.helius-rpc.com/";
-
-        const chainConfig = {
-          chainNamespace: CHAIN_NAMESPACES.SOLANA,
-          chainId: "0x3", // Please use 0x1 for Mainnet, 0x2 for Testnet, 0x3 for Devnet
-          rpcTarget: RPC_URL,
-          blockExplorerUrl: "https://explorer.solana.com",
-          ticker: "SOL",
-          tickerName: "Solana",
-          logo: "https://images.toruswallet.io/solana.svg",
-        };
-
-        const privateKeyProvider = new SolanaPrivateKeyProvider({
-          config: { chainConfig },
-        });
-
-        const web3 = new Web3Auth({
-          clientId:
-            "BJT95M-u7Mrx7s7uZvjdLXx1k8en8pvqWcourJsDOe-8QukCuMcLGEwczzu6glj10EWpPNUu8lXNKvbbNXSr4II",
-          web3AuthNetwork: WEB3AUTH_NETWORK.SAPPHIRE_DEVNET, // mainnet, aqua, celeste, cyan or testnet
-          privateKeyProvider,
-        });
-
-        setWeb3auth(web3);
-
-        await web3.initModal();
-
-        if (web3.provider) {
-          setProvider(web3.provider);
-        }
-      } catch (error) {
-        console.error(error);
-      }
-    };
-
-    init();
-  }, []);
-
-  const connect = async () => {
-    if (!web3auth) {
-      throw new Error("web3auth not initialized yet");
-    }
-    try {
-      const web3authProvider = await web3auth.connect();
-      setProvider(web3authProvider);
-      getAccounts().then((accounts) => {
-        if (!Array.isArray(accounts)) return;
-        setPublicKey(new PublicKey(accounts[0]));
-      });
-    } catch (e) {
-      console.log(e);
-    }
-  };
-
-  const getAccounts = useCallback(async () => {
-    if (!provider) {
-      throw new Error("provider not initialized yet");
-    }
-    const rpc = new RPC(provider);
-    return await rpc.getAccounts();
-  }, [provider]);
-
-  useEffect(() => {
-    if (!provider) {
-      setPublicKey(null);
-      return;
-    }
-
-    if (publicKey) return;
-
-    getAccounts().then((accounts) => {
-      if (!Array.isArray(accounts)) return;
-      setPublicKey(new PublicKey(accounts[0]));
-    });
-  }, [getAccounts, provider, publicKey]);
-
-  const disconnect = async () => {
-    if (!web3auth) {
-      throw new Error("web3auth not initialized yet");
-    }
-    await web3auth.logout();
-    setProvider(null);
-  };
 
   return {
     wallet: null,
@@ -160,8 +73,6 @@ export function useWithdrawWallet() {
     publicKey,
     sendTransaction,
     signMessage,
-    connect,
-    disconnect,
     connection,
     signTransaction,
   };
