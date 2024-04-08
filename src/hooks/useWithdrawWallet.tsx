@@ -26,7 +26,7 @@ export function useWithdrawWallet() {
   const connected = useMemo(() => !!publicKey, [publicKey]);
 
   useEffect(() => {
-    metakeep.getWallet().then(res => setPublicKey(res.wallet.solAddress));
+    metakeep.getWallet().then(res => setPublicKey(new PublicKey(res.wallet.solAddress)));
   }, [metakeep]);
 
   const connection = useMemo(() => {
@@ -35,11 +35,21 @@ export function useWithdrawWallet() {
 
   const signTransaction = useCallback(
     async (transaction: Transaction | VersionedTransaction) => {
-      console.dir(transaction, {depth: null, maxArrayLength: null});
-      const metakeepRes: {signedRawTransaction: string} = await metakeep.signTransaction(transaction, 'Withdraw USD');
-      return VersionedTransaction.deserialize(Buffer.from(metakeepRes.signedRawTransaction.replace('0x', ''), 'base64'));
+      const metakeepRes: {signature: string} = await metakeep.signTransaction(transaction, 'Withdraw USD');
+      const signature = Buffer.from(metakeepRes.signature.replace('0x', ''), 'hex');
+      if (transaction instanceof Transaction) {
+        transaction.signatures.push({
+          publicKey: publicKey!,
+          signature,
+        });
+        transaction.signatures = transaction.signatures.filter(sig => !!sig.signature);
+      } else {
+        transaction.signatures.push(signature);
+      }
+
+      return transaction;
     },
-    [metakeep],
+    [metakeep, publicKey],
   );
 
   const sendTransaction = useCallback(
