@@ -19,9 +19,6 @@ export function Withdraw() {
     // Optional
   }, []);
 
-  if (!wallet || !wallet.publicKey)
-    return <LoginForm connect={wallet.connect} />;
-
   return (
     <div style={{ height }} className={"w-full relative"}>
       {/*eslint-disable-next-line @typescript-eslint/ban-ts-comment */}
@@ -37,27 +34,6 @@ export function Withdraw() {
         loaderBackground={APP_THEME.background}
         handleHeightChange={handleHeightChange}
       />
-    </div>
-  );
-}
-
-function LoginForm({ connect }: { connect: () => void }) {
-  return (
-    <div
-      className={
-        "bg-black p-10 flex flex-1 relative items-center justify-center"
-      }
-    >
-      <button
-        className={
-          "bg-[#FFDA00] outline-none rounded-2xl p-5 px-7 hover:opacity-80 transition cursor-pointer"
-        }
-        onClick={connect}
-      >
-        <span className={"text-base font-semibold text-black"}>
-          Login to withdraw
-        </span>
-      </button>
     </div>
   );
 }
